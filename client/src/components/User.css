@@ -1,0 +1,23 @@
+.user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  color: blue;
+  border: 1px solid black;
+  border-radius: 50%;
+  justify-content: center;
+  margin: 10px 0;
+}
+.user_avatar {
+  flex: none;
+  height: 55px;
+  border-radius: 50%;
+}
+.user-name {
+  flex: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
