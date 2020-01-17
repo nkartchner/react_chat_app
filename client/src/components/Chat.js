@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import SocketIOClient from "socket.io-client";
 import MessageList from "./MessageList";
 import MessageForm from "./NewMessage";
 import UserList from "./UserList";
+import io from "socket.io-client";
 import faker from "faker";
 import "./Chat.css";
 
 const Chat = () => {
   const [name, setName] = useState("");
-  const [isReady, setIsReady] = useState(false);
+  const [socket] = useState(io(":8000"));
   const [users, setUsers] = useState({});
   const [messages, setMessages] = useState([]);
-  const [socket] = useState(SocketIOClient.connect("http://localhost:8000"));
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     socket.on("Welcome", () => {
       if (!name) {
@@ -25,13 +26,17 @@ const Chat = () => {
       setUsers(data.users);
       setMessages(data.messages);
     });
-    socket.on("new_user_connected", allUsers => setUsers(allUsers));
-    socket.on("new_message_from_server", newMessageFromServer => {
-      console.log(newMessageFromServer);
-      console.log(messages);
-      setMessages([newMessageFromServer, ...messages]);
-    });
-  }, [socket]);
+    socket.on("new_user_connected", setUsers);
+    socket.on("new_message_from_server", msg =>
+      setMessages(prevMessages => {
+        return [msg, ...prevMessages];
+      })
+    );
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const submitNewMessage = newMessage => {
     if (newMessage.length) {
       const message = {
@@ -58,4 +63,5 @@ const Chat = () => {
     </div>
   );
 };
+
 export default Chat;
